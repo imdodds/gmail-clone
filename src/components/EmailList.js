@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { IconButton } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -15,8 +15,25 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import '../styles/EmailList.css';
 import Section from './Section';
 import EmailRow from './EmailRow';
+import { db } from '../firebase';
 
 function EmailList() {
+
+  const [emails, setEmails] = useState([]);
+
+  useEffect(() => {
+    db.collection('emails')
+      .orderBy('timestamp', 'desc')
+      .onSnapshot((snapshot) => 
+        setEmails(
+          snapshot.docs.map((doc) => ({
+            id:doc.id,
+            data: doc.data(),
+          }))
+        )
+      );
+  }, []);
+
   return (
     <div className='emailList'>
       <div className='emailList__settings'>
@@ -55,18 +72,24 @@ function EmailList() {
       </div>
 
       <div className='emailList__list'>
-        <EmailRow
+        {emails.map(({ id, data: { to, subject, message, timestamp } }) => (
+          <EmailRow
+            id={id}
+            key={id}
+            title={to}
+            subject={subject}
+            description={message}
+            time={new Date(timestamp?.seconds * 1000).toUTCString()}
+          />
+        ))}
+
+        {/* <EmailRow
           title="Title"
           subject="This is the subject line"
           description="This is a test"
           time="10pm"
-        />
-        <EmailRow
-          title="Title"
-          subject="This is the subject line"
-          description="This is a really long message This is a really long message This is a really long message This is a really long message "
-          time="10pm"
-        />
+        /> */}
+
       </div>
     </div>
   )
