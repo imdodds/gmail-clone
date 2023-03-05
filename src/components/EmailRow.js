@@ -6,15 +6,31 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import LabelImportantIcon from '@mui/icons-material/LabelImportant';
 
 import '../styles/EmailRow.css';
+import { useDispatch } from 'react-redux';
+import { selectMail } from '../features/mailSlice';
 
 function EmailRow({ id, title, subject, description, time }) {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const openMail = () => {
+    dispatch(
+      selectMail({
+        id,
+        title,
+        subject,
+        description,
+        time,
+      })
+    );
+
+    navigate('/mail');
+  }
 
   return (
-    <div className='emailRow'>
-      
-      <div onClick={() => navigate('/mail')} className='emailRow__options'>
+    <div onClick={openMail} className='emailRow'>
+      <div className='emailRow__options'>
         <Checkbox />
         <IconButton>
           <StarBorderIcon />
